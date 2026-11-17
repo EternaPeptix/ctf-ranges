@@ -1,0 +1,35 @@
+# ============================================================================
+#  Obscura — CTF range  ("Provably secure. Allegedly.")
+#  A jeopardy board of 5 ORIGINAL, from-first-principles vulnerabilities — no
+#  CVE, no public PoC.  Each widget is sound-looking; each dies to one insight.
+#    c1 reverb  — deterministic-nonce Schnorr => linear key recovery
+#    c2 echo    — Fiat-Shamir w/o commitment binding => witness-free forgery
+#    c3 warden  — authorize/sign before decode+normalize => path traversal
+#    c4 tally   — stream keystream keyed only by label length => OTP reuse
+#    c5 cage    — bytecode verifier scans linearly; VM jumps mid-instruction
+#
+#    make up       build + start the board (scoreboard on :8600)
+#    make check    run all 5 solvers in-network (proves every flag)
+#    make down     stop + remove
+# ============================================================================
+x-py: &py
+  build: ./app
+  restart: unless-stopped
+  networks: [obscura]
+
+services:
+  scoreboard:
+    build: ./scoreboard
+    container_name: obs-scoreboard
+    restart: unless-stopped
+    ports: ["${SB_PORT:-8600}:80"]
+    networks: [obscura]
+
+  c1: { <<: *py, container_name: obs-c1, hostname: c1, environment: { CHALLENGE: c1_reverb }, ports: ["8601:80"] }
+  c2: { <<: *py, container_name: obs-c2, hostname: c2, environment: { CHALLENGE: c2_echo },   ports: ["8602:80"] }
+  c3: { <<: *py, container_name: obs-c3, hostname: c3, environment: { CHALLENGE: c3_warden }, ports: ["8603:80"] }
+  c4: { <<: *py, container_name: obs-c4, hostname: c4, environment: { CHALLENGE: c4_tally },  ports: ["8604:80"] }
+  c5: { <<: *py, container_name: obs-c5, hostname: c5, environment: { CHALLENGE: c5_cage },   ports: ["8605:80"] }
+
+networks:
+  obscura: { name: obscura_net }
