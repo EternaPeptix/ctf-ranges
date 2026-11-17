@@ -1,6 +1,6 @@
 # CTF Ranges
 
-A collection of **15 self-contained, automatically-verifiable CTF ranges** —
+A collection of **16 self-contained, automatically-verifiable CTF ranges** —
 each one a small, themed security playground you can stand up with Docker in a
 couple of commands. Every range re-implements real vulnerability classes
 (faithful, minimal, isolated), ships an automated solver, and proves itself
@@ -65,10 +65,11 @@ green, the range is solvable exactly as shipped.
 |-------|-------|------------|
 | [`vitachain-ctf`](vitachain-ctf) | A vitamin shop with on-chain checkout — six real **disclosed HackerOne reports** at the web ↔ crypto-payment seam; **extremely hard** | signed-webhook amount-binding bypass, reverted-transaction deposit credit, gift-card redemption race, SSRF → IMDS via DNS-rebind TOCTOU, RSA-pubkey-recovery → RS256/HS256 JWT confusion, GraphQL BOLA + alias-batching past the rate limiter |
 
-### Machine learning
+### Machine learning & learning theory
 | Range | Theme | Highlights |
 |-------|-------|------------|
 | [`synapse-ctf`](synapse-ctf) | A black-box function oracle that gives away more than its answers — **extremely hard**, a single genuinely novel technique | cryptanalytic reconstruction of a hidden ReLU network from exact query access: recover its kink hyperplanes from gradient jumps, then fit the output by exact rational linear algebra (no floating point anywhere) |
+| [`treadle-ctf`](treadle-ctf) | A loom whose hidden chain of pattern cards must be worked out — **hard**, a technique near-absent from bug-bounty corpora | active automata learning (Angluin's **L\*** with Rivest–Schapire counterexamples): reconstruct a hidden 24–40-state Mealy machine from membership queries and an exact equivalence teacher |
 
 ---
 

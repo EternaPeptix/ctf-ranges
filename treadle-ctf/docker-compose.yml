@@ -1,0 +1,28 @@
+# ============================================================================
+#  treadle -- a hidden-machine reconstruction puzzle sandbox
+#  One service holding a hidden Mealy machine (a loom with a secret card chain).
+#
+#    make up      build + start the service        (http://localhost:8900)
+#    make check   run the reference solver in-network, exit 0 iff token recovered
+#    make down    stop + remove
+#    make reset   down + up (fresh secret machine and token)
+# ============================================================================
+name: treadle
+
+services:
+  app:
+    build: ./app
+    container_name: trd-app
+    hostname: app
+    restart: unless-stopped
+    ports: ["8900:80"]
+    networks: [treadle]
+
+networks:
+  treadle:
+    name: treadle_net
+    # Explicit subnet: the host's default Docker address pools are exhausted,
+    # so letting Docker pick one makes `up` fail.
+    ipam:
+      config:
+        - subnet: 10.86.0.0/24
