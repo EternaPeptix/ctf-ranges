@@ -1,0 +1,65 @@
+# ============================================================================
+#  Cumulus — a cloud attack-path CTF range
+#  A single breach that walks the classic cloud kill-chain against a fictional
+#  provider: SSRF -> instance metadata (IMDS) -> S3 bucket misconfig -> IAM
+#  privilege escalation -> Kubernetes (EKS) secrets. Self-contained mock-cloud
+#  services (no real cloud, no Docker socket). Flags CLD{...}.
+#
+#    chat/web (public) -> imds -> controlplane (S3/IAM/STS) -> kubeapi
+#
+#    make up      build + start the platform + scoreboard
+#    make check   run the full kill-chain solver (proves all 4 flags), exit 0
+#    make down    stop + remove
+# ============================================================================
+name: cumulus
+
+services:
+  web:                            # public app with the SSRF entry point
+    build: ./services/web
+    container_name: cml-web
+    hostname: web
+    restart: unless-stopped
+    ports: ["${WEB_PORT:-8097}:80"]
+    networks: [cumulus]
+
+  imds:                           # instance metadata service (169.254.169.254-analog)
+    build: ./services/imds
+    container_name: cml-imds
+    hostname: imds
+    restart: unless-stopped
+    networks: [cumulus]
+
+  controlplane:                   # mock cloud API: S3 + IAM + STS (public endpoint)
+    build: ./services/controlplane
+    container_name: cml-controlplane
+    hostname: controlplane
+    restart: unless-stopped
+    ports: ["${CP_PORT:-8098}:80"]
+    networks: [cumulus]
+
+  kubeapi:                        # mock Kubernetes apiserver (EKS public endpoint)
+    build: ./services/kubeapi
+    container_name: cml-kubeapi
+    hostname: kubeapi
+    restart: unless-stopped
+    ports: ["${K8S_PORT:-8099}:80"]
+    networks: [cumulus]
+
+  scoreboard:
+    build: ./services/scoreboard
+    container_name: cml-scoreboard
+    hostname: scoreboard
+    restart: unless-stopped
+    environment:
+      - WEB_PORT=${WEB_PORT:-8097}
+    ports: ["${SB_PORT:-8507}:80"]
+    networks: [cumulus]
+
+networks:
+  cumulus:
+    name: cumulus_net
+    # explicit subnet: this host has many range networks and Docker's default
+    # address pool is exhausted; a fixed /24 sidesteps auto-allocation.
+    ipam:
+      config:
+        - subnet: 10.89.7.0/24

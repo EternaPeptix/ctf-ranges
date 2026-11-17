@@ -1,0 +1,62 @@
+# ============================================================================
+#  The Deep End — CTF range
+#  Six "black-belt" H2-2026 CVEs where the exploitation TECHNIQUE is the puzzle.
+#  Independent challenges; a scoreboard checks flags.
+#
+#    make up      build + start everything (scoreboard on :8400)
+#    make check   run all 6 solvers (proves every flag)
+#    make down    stop + remove
+# ============================================================================
+services:
+  scoreboard:
+    build: ./scoreboard
+    container_name: de-scoreboard
+    restart: unless-stopped
+    ports: ["${SB_PORT:-8400}:80"]
+    networks: [deepend]
+
+  c1:                     # CVE-2026-88009 Traefik URL.Opaque routing/forwarding desync
+    build: ./challenges/c1-traefik-opaque
+    container_name: de-c1
+    hostname: c1
+    restart: unless-stopped
+    ports: ["8401:80"]
+    networks: [deepend]
+  c2:                     # CVE-2026-117691 Keycloak SAML redirect %-encoding differential
+    build: ./challenges/c2-saml-canon
+    container_name: de-c2
+    hostname: c2
+    restart: unless-stopped
+    ports: ["8402:80"]
+    networks: [deepend]
+  c3:                     # CVE-2026-55174 ECDSA adaptor-signature forgery
+    build: ./challenges/c3-adaptor-sig
+    container_name: de-c3
+    hostname: c3
+    restart: unless-stopped
+    ports: ["8403:80"]
+    networks: [deepend]
+  c4:                     # CVE-2026-81020 AES-GCM nonce-reuse "forbidden attack"
+    build: ./challenges/c4-gcm-forbidden
+    container_name: de-c4
+    hostname: c4
+    restart: unless-stopped
+    ports: ["8404:80"]
+    networks: [deepend]
+  c5:                     # CVE-2026-76825 RestrictedPython Formatter sandbox escape
+    build: ./challenges/c5-restrictedpython
+    container_name: de-c5
+    hostname: c5
+    restart: unless-stopped
+    ports: ["8405:80"]
+    networks: [deepend]
+  c6:                     # CVE-2026-115905 Rust zip2 "zip cloaking" parser differential
+    build: ./challenges/c6-zip-cloak
+    container_name: de-c6
+    hostname: c6
+    restart: unless-stopped
+    ports: ["8406:80"]
+    networks: [deepend]
+
+networks:
+  deepend: { name: deepend_net }

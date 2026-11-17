@@ -1,0 +1,71 @@
+# ============================================================================
+#  Teardown — a binary exploitation & reverse-engineering range
+#  Five pwnables served over TCP (socat): a ret2win overflow, a format-string
+#  write, a ret2libc ROP chain, an RE crackme, and a heap tcache-poison UAF.
+#  glibc 2.36 (debian:12), x86-64. Flags TD{...}.
+#
+#    make up      build + start all five challenges + the scoreboard
+#    make check   run the full pwntools solver (proves all 5 flags), exit 0
+#    make down    stop + remove
+#
+#  NOTE: the challenges are x86-64 (amd64) ELF binaries, pinned to
+#  platform linux/amd64 so they run (emulated) on Apple-silicon hosts too.
+# ============================================================================
+name: teardown
+
+services:
+  c1:                             # ret2win stack overflow
+    build: ./challenges/c1-overflow
+    platform: linux/amd64
+    container_name: td-c1
+    hostname: c1
+    restart: unless-stopped
+    ports: ["${C1_PORT:-9001}:9001"]
+    networks: [teardown]
+
+  c2:                             # format-string -> global overwrite -> shell
+    build: ./challenges/c2-format
+    platform: linux/amd64
+    container_name: td-c2
+    hostname: c2
+    restart: unless-stopped
+    ports: ["${C2_PORT:-9002}:9002"]
+    networks: [teardown]
+
+  c3:                             # ret2libc ROP (leak + system)
+    build: ./challenges/c3-rop
+    platform: linux/amd64
+    container_name: td-c3
+    hostname: c3
+    restart: unless-stopped
+    ports: ["${C3_PORT:-9003}:9003"]
+    networks: [teardown]
+
+  c4:                             # RE crackme
+    build: ./challenges/c4-crackme
+    platform: linux/amd64
+    container_name: td-c4
+    hostname: c4
+    restart: unless-stopped
+    ports: ["${C4_PORT:-9004}:9004"]
+    networks: [teardown]
+
+  c5:                             # heap UAF -> tcache poison -> fptr overwrite
+    build: ./challenges/c5-heap
+    platform: linux/amd64
+    container_name: td-c5
+    hostname: c5
+    restart: unless-stopped
+    ports: ["${C5_PORT:-9005}:9005"]
+    networks: [teardown]
+
+  scoreboard:
+    build: ./services/scoreboard
+    container_name: td-scoreboard
+    hostname: scoreboard
+    restart: unless-stopped
+    ports: ["${SB_PORT:-8506}:80"]
+    networks: [teardown]
+
+networks:
+  teardown: { name: teardown_net }

@@ -1,0 +1,51 @@
+# ============================================================================
+#  Delphi — an oracle-manipulation CTF range
+#  Six independent smart-contract challenges, each a different way that trusting
+#  a price goes wrong. On a local anvil chain; each flag (ORC{...}) is released
+#  by the dispenser only once the challenge is actually solved on-chain.
+#
+#    make up      build + start the chain, deploy challenges, start the board
+#    make check   run the full solver in-network (proves all 6 flags), exit 0
+#    make down    stop + remove
+# ============================================================================
+name: delphi
+
+services:
+  chain:
+    build: ./services/chain
+    container_name: dlp-chain
+    hostname: chain
+    restart: unless-stopped
+    ports: ["${RPC_PORT:-8547}:8545"]
+    networks: [delphi]
+
+  deployer:                       # one-shot: deploys all challenges then exits
+    build: ./contracts
+    image: delphi-contracts
+    container_name: dlp-deployer
+    depends_on: [chain]
+    command: ["bash", "/contracts/deploy.sh"]
+    environment:
+      - RPC_URL=http://chain:8545
+    volumes: ["shared:/shared"]
+    networks: [delphi]
+    restart: "no"
+
+  dispenser:                      # scoreboard + on-chain flag oracle
+    build: ./services/dispenser
+    container_name: dlp-dispenser
+    hostname: dispenser
+    restart: unless-stopped
+    depends_on: [deployer]
+    environment:
+      - RPC_URL=http://chain:8545
+      - RPC_PORT=${RPC_PORT:-8547}
+    ports: ["${SB_PORT:-8503}:80"]
+    volumes: ["shared:/shared"]
+    networks: [delphi]
+
+volumes:
+  shared: {}
+
+networks:
+  delphi: { name: delphi_net }

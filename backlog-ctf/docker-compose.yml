@@ -1,0 +1,60 @@
+# ============================================================================
+#  The Backlog — CTF range
+#  A security team's unpatched backlog: 15 INDEPENDENT jeopardy challenges,
+#  one real H2-2026 CVE each, across SQLi / SSTI / SSRF / LFI / upload /
+#  arg-injection / XXE / IDOR / JWT / authz-normalization / deserialization /
+#  AI-config-RCE / AI-agent-abuse / non-HTTP. Solve in any order.
+#
+#    make up       build + start the board (scoreboard on :8300)
+#    make check    run all 15 solvers (in-network; proves every flag)
+#    make down     stop + remove
+# ============================================================================
+x-py: &py
+  build: ./app
+  restart: unless-stopped
+  networks: [backlog]
+
+services:
+  scoreboard:
+    build: ./scoreboard
+    container_name: bl-scoreboard
+    restart: unless-stopped
+    ports: ["${SB_PORT:-8300}:80"]
+    networks: [backlog]
+
+  c01: { <<: *py, container_name: bl-c01, hostname: c01, environment: { CHALLENGE: c01 }, ports: ["8301:80"] }
+  c02: { <<: *py, container_name: bl-c02, hostname: c02, environment: { CHALLENGE: c02 }, ports: ["8302:80"] }
+  c03: { <<: *py, container_name: bl-c03, hostname: c03, environment: { CHALLENGE: c03 }, ports: ["8303:80"] }
+  c04:
+    build: ./php/c04-dompdf
+    container_name: bl-c04
+    hostname: c04
+    restart: unless-stopped
+    ports: ["8304:80"]
+    networks: [backlog]
+  c05:
+    build: ./php/c05-cockpit
+    container_name: bl-c05
+    hostname: c05
+    restart: unless-stopped
+    ports: ["8305:80"]
+    networks: [backlog]
+  c06: { <<: *py, container_name: bl-c06, hostname: c06, environment: { CHALLENGE: c06 }, ports: ["8306:80"] }
+  c07: { <<: *py, container_name: bl-c07, hostname: c07, environment: { CHALLENGE: c07 }, ports: ["8307:80"] }
+  c08: { <<: *py, container_name: bl-c08, hostname: c08, environment: { CHALLENGE: c08 }, ports: ["8308:80"] }
+  c09: { <<: *py, container_name: bl-c09, hostname: c09, environment: { CHALLENGE: c09 }, ports: ["8309:80"] }
+  c10: { <<: *py, container_name: bl-c10, hostname: c10, environment: { CHALLENGE: c10 }, ports: ["8310:80"] }
+  c11: { <<: *py, container_name: bl-c11, hostname: c11, environment: { CHALLENGE: c11 }, ports: ["8311:80"] }
+  c12:
+    build: ./php/c12-maxsite
+    container_name: bl-c12
+    hostname: c12
+    restart: unless-stopped
+    ports: ["8312:80"]
+    networks: [backlog]
+  c13: { <<: *py, container_name: bl-c13, hostname: c13, environment: { CHALLENGE: c13 }, ports: ["8313:80"] }
+  c14: { <<: *py, container_name: bl-c14, hostname: c14, environment: { CHALLENGE: c14 }, ports: ["8314:80"] }
+  c15: { <<: *py, container_name: bl-c15, hostname: c15, environment: { CHALLENGE: c15 }, ports: ["8315:80"] }
+
+networks:
+  backlog: { name: backlog_net }

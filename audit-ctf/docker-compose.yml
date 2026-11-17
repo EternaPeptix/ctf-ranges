@@ -1,0 +1,56 @@
+# ============================================================================
+#  The Audit — a database & SSH audit CTF slice
+#  Live exploits against real PostgreSQL, MySQL/MariaDB, SQLite and SSH, plus a
+#  forensic "audit the logs" challenge. Flags AUD{...}.
+#
+#    make up      build + start every service + the scoreboard
+#    make check   run the full solver in-network (proves all 5 flags), exit 0
+#    make down    stop + remove
+# ============================================================================
+name: audit
+
+services:
+  postgres:                       # C1 — COPY FROM PROGRAM superuser RCE
+    build: ./services/postgres
+    container_name: aud-postgres
+    hostname: postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_PASSWORD=postgres
+    ports: ["${PG_PORT:-55432}:5432"]
+    networks: [audit]
+
+  mariadb:                        # C2 — FILE privilege + secure_file_priv="" LOAD_FILE
+    build: ./services/mariadb
+    container_name: aud-mariadb
+    hostname: mariadb
+    restart: unless-stopped
+    ports: ["${MY_PORT:-33306}:3306"]
+    networks: [audit]
+
+  webapp:                         # C3 — SQLite UNION SQLi  (+ the leaked SSH key backup)
+    build: ./services/webapp
+    container_name: aud-webapp
+    hostname: webapp
+    restart: unless-stopped
+    ports: ["${APP_PORT:-8096}:80"]
+    networks: [audit]
+
+  ssh:                            # C4 — leaked private-key foothold
+    build: ./services/ssh
+    container_name: aud-ssh
+    hostname: ssh
+    restart: unless-stopped
+    ports: ["${SSH_PORT:-2222}:22"]
+    networks: [audit]
+
+  scoreboard:                     # board + flag check + C5 forensic log bundle
+    build: ./services/scoreboard
+    container_name: aud-scoreboard
+    hostname: scoreboard
+    restart: unless-stopped
+    ports: ["${SB_PORT:-8505}:80"]
+    networks: [audit]
+
+networks:
+  audit: { name: audit_net }

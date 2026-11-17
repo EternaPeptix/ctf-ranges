@@ -1,0 +1,21 @@
+# ============================================================================
+#  Dropspot — CTF range  ("Ship It")
+#  A parody file-sharing startup whose app is full of bugs that are
+#  blindingly obvious once you see them, and incredibly easy to miss:
+#  an exposed .git, IDOR, alg:none JWT, X-Forwarded-For spoofing, mass
+#  assignment, a debug flag left on, and a backup.zip in the webroot.
+#
+#    make up      build + start
+#    make check   run the automated solver
+#    make down    stop + remove
+# ============================================================================
+services:
+  web:
+    build: ./deploy/web
+    container_name: ds-web
+    hostname: dropspot.example
+    restart: unless-stopped
+    ports: ["${WEB_PORT:-8080}:80"]
+
+networks:
+  default: { name: ds_net }

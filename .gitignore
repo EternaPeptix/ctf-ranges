@@ -1,0 +1,8 @@
+# Build artifacts / local state across all ranges
+.env
+*.log
+.DS_Store
+__pycache__/
+*/contracts/out/
+*/contracts/cache/
+*/contracts/broadcast/

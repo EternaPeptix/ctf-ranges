@@ -1,0 +1,6 @@
+User-agent: *
+# please don't index our internal stuff, thanks
+Disallow: /.git/
+Disallow: /admin-x9z1
+Disallow: /uploads/
+Disallow: /api/config

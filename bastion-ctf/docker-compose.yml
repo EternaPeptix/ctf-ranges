@@ -1,0 +1,24 @@
+# ============================================================================
+#  Bastion — CTF range  ("Military-grade security.")
+#  A portal that looks airtight. Every flag sits behind a single non-obvious
+#  insight: nearly impossible to spot black-box, a one-liner once you see it.
+#    - zero-width-character stego          (invisible in the page)
+#    - Unicode NFKC vs lower() mismatch    (homoglyph admin)
+#    - AES-ECB cut-and-paste               (shuffle cookie blocks)
+#    - MD5 length extension                (forge a signed request)
+#    - unanchored allowlist regex          (SSRF to the localhost-only flag)
+#
+#    make up      build + start
+#    make check   run the automated solver
+#    make down    stop + remove
+# ============================================================================
+services:
+  web:
+    build: ./deploy/web
+    container_name: bas-web
+    hostname: bastion.example
+    restart: unless-stopped
+    ports: ["${WEB_PORT:-8080}:80"]
+
+networks:
+  default: { name: bas_net }

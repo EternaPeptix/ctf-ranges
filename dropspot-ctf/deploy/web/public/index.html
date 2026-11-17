@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dropspot — share files privately. probably.</title>
+<!-- TODO before launch: remove debug, move backup off webroot, rotate the leaked key.
+     ...we'll do it after the demo. ship it.  DS{1ts_r1ght_th3r3_1n_th3_html_c0mm3nt} -->
+<style>
+ body{font:16px/1.6 -apple-system,Segoe UI,Arial;max-width:680px;margin:48px auto;padding:0 20px;color:#16202a}
+ header{display:flex;align-items:center;gap:10px}
+ h1{font-size:26px;margin:0;color:#2f6df6}
+ .tag{color:#7a8798}
+ .card{border:1px solid #e3e8ef;border-radius:12px;padding:20px;margin:22px 0;background:#fbfcfe}
+ code{background:#eef2f8;padding:1px 6px;border-radius:5px}
+ button{background:#2f6df6;color:#fff;border:0;border-radius:8px;padding:9px 14px;cursor:pointer}
+ footer{color:#9aa6b4;font-size:13px;margin-top:40px}
+</style>
+</head>
+<body>
+<header><h1>▲ Dropspot</h1><span class="tag">share files privately. probably.</span></header>
+
+<div class="card">
+  <p>Upload a file, get a private link. That's it. We move fast.</p>
+  <button onclick="alert('Signups are API-only during beta — see app.js')">Get started</button>
+</div>
+
+<div class="card">
+  <h3>Your shares</h3>
+  <p>Open one of your shares at <code>/d/&lt;id&gt;</code> — for example your
+     welcome file is at <code>/d/1007</code>.</p>
+</div>
+
+<script src="/app.js"></script>
+<footer>© Dropspot, Inc. · beta · <a href="/robots.txt">robots.txt</a></footer>
+</body>
+</html>

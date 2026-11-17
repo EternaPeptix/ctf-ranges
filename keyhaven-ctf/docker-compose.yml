@@ -1,0 +1,67 @@
+# ============================================================================
+#  Keyhaven — CTF range  ("Null Cipher")
+#  7 real, pre-2026, NON-KEV, deep-mechanism CVEs chained across a
+#  privacy-first SSO + secure-document vendor's stack.
+#
+#  Only the edge is published. Everything else is on the internal `corp`
+#  network with NO host ports — reach it by pivoting (starting with an
+#  HTTP request-smuggle past the edge ACL).
+#
+#    make up        build + start the whole range
+#    make check     run the automated end-to-end solver
+#    make down      stop + remove (incl. volumes)
+# ============================================================================
+services:
+
+  # ---- edge / internet-facing (TE/CL request-smuggling front) -------------
+  edge:
+    build: ./deploy/edge
+    container_name: kh-edge
+    hostname: app.keyhaven.example
+    restart: unless-stopped
+    environment:
+      UPSTREAM_HOST: sso.corp.keyhaven.example
+      UPSTREAM_PORT: "80"
+      KH_CORP_SECRET: ${KH_CORP_SECRET:-k3yh4v3n-c0rp-s3cr3t-2026}
+    ports: ["${EDGE_PORT:-8080}:80"]
+    networks:
+      edge: { aliases: [app.keyhaven.example] }
+      corp: { aliases: [app.keyhaven.example] }
+
+  # ---- SSO / identity (SAML SP + JWT issuer) ------------------------------
+  sso:                 # CVE-2019-18277 (framing) + CVE-2018-0489 SAML XSW
+    build: ./deploy/sso
+    container_name: kh-sso
+    hostname: sso.corp.keyhaven.example
+    restart: unless-stopped
+    environment:
+      KH_CORP_SECRET: ${KH_CORP_SECRET:-k3yh4v3n-c0rp-s3cr3t-2026}
+    networks: { corp: { aliases: [sso.corp.keyhaven.example] } }
+
+  # ---- internal API (JWT verify + capability tokens + config merge) -------
+  api:                 # CVE-2018-0114 jwk inj · CVE-2016-2107 CBC oracle · CVE-2019-10744 proto-pollution
+    build: ./deploy/api
+    container_name: kh-api
+    hostname: api.corp.keyhaven.example
+    restart: unless-stopped
+    networks: { corp: { aliases: [api.corp.keyhaven.example] } }
+
+  # ---- document vault / renderer (YAML config import) ---------------------
+  vault:               # CVE-2020-14343 PyYAML full_load RCE
+    build: ./deploy/vault
+    container_name: kh-vault
+    hostname: vault.corp.keyhaven.example
+    restart: unless-stopped
+    networks: { corp: { aliases: [vault.corp.keyhaven.example] } }
+
+  # ---- signing service (biased-nonce ECDSA) -------------------------------
+  signer:              # CVE-2024-31497 biased-nonce ECDSA -> HNP/lattice
+    build: ./deploy/signer
+    container_name: kh-signer
+    hostname: signer.corp.keyhaven.example
+    restart: unless-stopped
+    networks: { corp: { aliases: [signer.corp.keyhaven.example] } }
+
+networks:
+  edge: { name: kh_edge }
+  corp: { name: kh_corp, internal: true }

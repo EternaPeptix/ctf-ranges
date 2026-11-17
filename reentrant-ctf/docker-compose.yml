@@ -1,0 +1,56 @@
+# ============================================================================
+#  Reentrant — a DeFi CTF range
+#  A fictional DeFi protocol that gets thoroughly rekt. Six independent
+#  smart-contract challenges on a local anvil chain; each flag (RKT{...}) is
+#  released by the dispenser only once the challenge is actually solved
+#  on-chain (it verifies isSolved() via eth_call).
+#
+#    chain      anvil dev chain (RPC on :8545)
+#    deployer   one-shot: deploys all 6 challenges, writes /shared/addrs.env
+#    dispenser  scoreboard + on-chain flag oracle (:8502)
+#
+#    make up      build + start the chain, deploy challenges, start the board
+#    make check   run every exploit in-network, prove all 6 flags (exit 0)
+#    make down    stop + remove everything
+# ============================================================================
+name: reentrant
+
+services:
+  chain:
+    build: ./services/chain
+    container_name: rkt-chain
+    hostname: chain
+    restart: unless-stopped
+    ports: ["${RPC_PORT:-8545}:8545"]
+    networks: [reentrant]
+
+  deployer:                       # one-shot: deploys all challenges then exits
+    build: ./contracts
+    image: reentrant-contracts
+    container_name: rkt-deployer
+    depends_on: [chain]
+    command: ["bash", "/contracts/deploy.sh"]
+    environment:
+      - RPC_URL=http://chain:8545
+    volumes: ["shared:/shared"]
+    networks: [reentrant]
+    restart: "no"
+
+  dispenser:                      # scoreboard + on-chain flag oracle
+    build: ./services/dispenser
+    container_name: rkt-dispenser
+    hostname: dispenser
+    restart: unless-stopped
+    depends_on: [deployer]
+    environment:
+      - RPC_URL=http://chain:8545
+      - RPC_PORT=${RPC_PORT:-8545}
+    ports: ["${SB_PORT:-8502}:80"]
+    volumes: ["shared:/shared"]
+    networks: [reentrant]
+
+volumes:
+  shared: {}
+
+networks:
+  reentrant: { name: reentrant_net }

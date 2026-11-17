@@ -1,0 +1,10 @@
+[profile.default]
+src = "src"
+script = "script"
+out = "out"
+libs = []
+solc = "0.8.24"
+optimizer = true
+optimizer_runs = 200
+# allow the deploy script to write the deployed-address manifest
+fs_permissions = [{ access = "read-write", path = "/shared" }]

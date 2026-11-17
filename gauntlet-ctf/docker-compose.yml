@@ -1,0 +1,51 @@
+# ============================================================================
+#  The Gauntlet — the hardest range. Seven research-grade on-chain challenges
+#  (ECDSA cryptanalysis, a Merkle second-preimage, an ecrecover quirk, EIP-1153
+#  transient-storage reentrancy, weak randomness, a selector/facet hijack, and a
+#  BN254 pairing-verifier bypass). Flags GG{...}, released only on an on-chain solve.
+#
+#    make up      build + start the chain, deploy all 7 challenges, start the board
+#    make check   run the full solver in-network (proves all 7 flags), exit 0
+#    make down    stop + remove
+# ============================================================================
+name: gauntlet
+
+services:
+  chain:
+    build: ./services/chain
+    container_name: gnt-chain
+    hostname: chain
+    restart: unless-stopped
+    ports: ["${RPC_PORT:-8549}:8545"]
+    networks: [gauntlet]
+
+  deployer:
+    build: ./contracts
+    image: gauntlet-contracts
+    container_name: gnt-deployer
+    depends_on: [chain]
+    command: ["bash", "/contracts/deploy.sh"]
+    environment:
+      - RPC_URL=http://chain:8545
+    volumes: ["shared:/shared"]
+    networks: [gauntlet]
+    restart: "no"
+
+  dispenser:
+    build: ./services/dispenser
+    container_name: gnt-dispenser
+    hostname: dispenser
+    restart: unless-stopped
+    depends_on: [deployer]
+    environment:
+      - RPC_URL=http://chain:8545
+      - RPC_PORT=${RPC_PORT:-8549}
+    ports: ["${SB_PORT:-8504}:80"]
+    volumes: ["shared:/shared"]
+    networks: [gauntlet]
+
+volumes:
+  shared: {}
+
+networks:
+  gauntlet: { name: gauntlet_net }

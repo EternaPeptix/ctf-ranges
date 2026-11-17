@@ -1,0 +1,64 @@
+# ============================================================================
+#  Puppeteer — CTF range
+#  An internal agentic-AI assistant you turn against its owner. The architecture
+#  IS the attack surface: a deterministic planner with MCP-style tools, each
+#  tool backed by a service carrying one real, advisory-only 2026 CVE. You drive
+#  every stage by poisoning ingested documents with directives the agent obeys.
+#
+#  chat/upload -> orchestrator(planner) -> gateway -> tools -> vectordb -> models -> memory
+#
+#    make up      build + start the platform (chat on :8500, scoreboard :8501)
+#    make check   run the full kill-chain solver (proves every flag)
+#    make down    stop + remove
+# ============================================================================
+services:
+  orchestrator:                 # CVE-2026-104250 ingestion prompt injection + the planner
+    build: ./services/orchestrator
+    container_name: pup-orchestrator
+    hostname: orchestrator
+    restart: unless-stopped
+    ports: ["${CHAT_PORT:-8500}:80"]
+    networks: [puppeteer]
+
+  gateway:                      # CVE-2026-110719 Portkey custom-host SSRF
+    build: ./services/gateway
+    container_name: pup-gateway
+    hostname: gateway
+    restart: unless-stopped
+    networks: [puppeteer]
+  tools:                        # CVE-2026-40933 Flowise MCP stdio command injection
+    build: ./services/tools
+    container_name: pup-tools
+    hostname: tools
+    restart: unless-stopped
+    networks: [puppeteer]
+  vectordb:                     # CVE-2026-45830 ChromaDB cross-tenant collection IDOR
+    build: ./services/vectordb
+    container_name: pup-vectordb
+    hostname: vectordb
+    restart: unless-stopped
+    networks: [puppeteer]
+  models:                       # CVE-2026-115533 LeRobot from_pretrained config-class RCE
+    build: ./services/models
+    container_name: pup-models
+    hostname: models
+    restart: unless-stopped
+    networks: [puppeteer]
+  memory:                       # CVE-2026-29071 Open WebUI memory retrieval IDOR
+    build: ./services/memory
+    container_name: pup-memory
+    hostname: memory
+    restart: unless-stopped
+    networks: [puppeteer]
+
+  scoreboard:
+    build: ./scoreboard
+    container_name: pup-scoreboard
+    restart: unless-stopped
+    environment:
+      - CHAT_PORT=${CHAT_PORT:-8500}
+    ports: ["${SB_PORT:-8501}:80"]
+    networks: [puppeteer]
+
+networks:
+  puppeteer: { name: puppeteer_net }
