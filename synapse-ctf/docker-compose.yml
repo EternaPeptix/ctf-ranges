@@ -1,0 +1,28 @@
+# ============================================================================
+#  synapse -- a function-reconstruction puzzle sandbox
+#  One service holding a hidden piecewise-linear function f: Q^6 -> Q.
+#
+#    make up      build + start the service        (http://localhost:8800)
+#    make check   run the reference solver in-network, exit 0 iff token recovered
+#    make down    stop + remove
+#    make reset   down + up (fresh secret function and token)
+# ============================================================================
+name: synapse
+
+services:
+  app:
+    build: ./app
+    container_name: syn-app
+    hostname: app
+    restart: unless-stopped
+    ports: ["8800:80"]
+    networks: [synapse]
+
+networks:
+  synapse:
+    name: synapse_net
+    # Explicit subnet: the host's default Docker address pools are exhausted,
+    # so letting Docker pick one makes `up` fail.
+    ipam:
+      config:
+        - subnet: 10.85.0.0/24
