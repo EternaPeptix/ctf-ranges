@@ -1,6 +1,6 @@
 # CTF Ranges
 
-A collection of **16 self-contained, automatically-verifiable CTF ranges** —
+A collection of **17 self-contained, automatically-verifiable CTF ranges** —
 each one a small, themed security playground you can stand up with Docker in a
 couple of commands. Every range re-implements real vulnerability classes
 (faithful, minimal, isolated), ships an automated solver, and proves itself
@@ -35,6 +35,7 @@ green, the range is solvable exactly as shipped.
 |-------|-------|------------|
 | [`keyhaven-ctf`](keyhaven-ctf) | A "privacy-first" vendor that botches its own crypto — a 7-stage chain | HTTP request smuggling, SAML signature wrapping, JWK header injection, CBC padding oracle, prototype pollution, PyYAML RCE, biased-nonce lattice (HNP) key recovery |
 | [`deepend-ctf`](deepend-ctf) | Six research-grade H2-2026 techniques where the *method* is the puzzle | Traefik `URL.Opaque` desync, SAML redirect canonicalization diff, ECDSA adaptor-signature forgery, AES-GCM forbidden attack, RestrictedPython sandbox escape, Rust `zip2` cloaking |
+| [`mintmark-ctf`](mintmark-ctf) | A key that is safe alone but doomed in a crowd — the **emergent** lesson of the 2012 "Mining your Ps and Qs" internet scan, found by sheer circumstance | one shared prime hidden in a directory of RSA moduli: unfactorable alone (no small factors, Fermat-safe), opened only by a **cross-directory GCD** (pairwise / batch GCD) → factor, invert, unseal |
 
 ### Smart contracts / DeFi (EVM)
 | Range | Theme | Highlights |

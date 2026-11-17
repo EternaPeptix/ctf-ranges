@@ -1,0 +1,29 @@
+# ============================================================================
+#  mintmark -- a number-theory puzzle sandbox
+#  One service holding a register of large composite numbers and one sealed
+#  vault (the strongroom of an old mint).
+#
+#    make up      build + start the service        (http://localhost:9100)
+#    make check   run the reference solver in-network, exit 0 iff token recovered
+#    make down    stop + remove
+#    make reset   down + up (fresh register, fresh sealed value, fresh token)
+# ============================================================================
+name: mintmark
+
+services:
+  app:
+    build: ./app
+    container_name: mm-app
+    hostname: app
+    restart: unless-stopped
+    ports: ["9100:80"]
+    networks: [mintmark]
+
+networks:
+  mintmark:
+    name: mintmark_net
+    # Explicit subnet: the host's default Docker address pools are exhausted,
+    # so letting Docker pick one makes `up` fail.
+    ipam:
+      config:
+        - subnet: 10.87.0.0/24
