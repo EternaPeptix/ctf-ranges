@@ -1,6 +1,6 @@
 # CTF Ranges
 
-A collection of **17 self-contained, automatically-verifiable CTF ranges** —
+A collection of **18 self-contained, automatically-verifiable CTF ranges** —
 each one a small, themed security playground you can stand up with Docker in a
 couple of commands. Every range re-implements real vulnerability classes
 (faithful, minimal, isolated), ships an automated solver, and proves itself
@@ -55,6 +55,7 @@ green, the range is solvable exactly as shipped.
 | [`audit-ctf`](audit-ctf) | A database & SSH security audit | PostgreSQL `COPY FROM PROGRAM` RCE, MySQL `FILE`/`LOAD_FILE`, SQLite UNION injection, leaked SSH key, and a log-forensics challenge |
 | [`cumulus-ctf`](cumulus-ctf) | One cloud breach, start to finish | SSRF → IMDS credential theft → S3 bucket misconfig → IAM `CreatePolicyVersion` privesc → EKS/Kubernetes secrets |
 | [`teardown-ctf`](teardown-ctf) | Binary exploitation & reverse engineering | ret2win overflow, format string, ROP → `system`, an RE crackme, and a modern heap **tcache safe-linking** poison |
+| [`carillon-ctf`](carillon-ctf) | A little machine whose manual is a lie — the **emergent** lesson of sandsifter / Project Rosenbridge, surfaced by sheer probing | a documented command set + a locked compartment: one *undocumented* command code (unlike every other, which stops the machine) silently opens it — found only by probing the undefined opcode space until one byte contradicts the spec |
 
 ### Original synthesis (no CVEs)
 | Range | Theme | Highlights |

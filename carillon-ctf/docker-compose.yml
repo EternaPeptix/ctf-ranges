@@ -1,0 +1,28 @@
+# ============================================================================
+#  carillon -- a discovery puzzle about a little machine
+#  One service: a clockwork music box that runs byte programs.
+#
+#    make up      build + start the service        (http://localhost:9200)
+#    make check   run the reference solver in-network, exit 0 iff token recovered
+#    make down    stop + remove
+#    make reset   down + up (fresh special command and token)
+# ============================================================================
+name: carillon
+
+services:
+  app:
+    build: ./app
+    container_name: car-app
+    hostname: app
+    restart: unless-stopped
+    ports: ["9200:80"]
+    networks: [carillon]
+
+networks:
+  carillon:
+    name: carillon_net
+    # Explicit subnet: the host's default Docker address pools are exhausted,
+    # so letting Docker pick one makes `up` fail.
+    ipam:
+      config:
+        - subnet: 10.88.0.0/24
