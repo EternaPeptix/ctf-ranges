@@ -1,6 +1,6 @@
 # CTF Ranges
 
-A collection of **13 self-contained, automatically-verifiable CTF ranges** —
+A collection of **14 self-contained, automatically-verifiable CTF ranges** —
 each one a small, themed security playground you can stand up with Docker in a
 couple of commands. Every range re-implements real vulnerability classes
 (faithful, minimal, isolated), ships an automated solver, and proves itself
@@ -59,6 +59,11 @@ green, the range is solvable exactly as shipped.
 | Range | Theme | Highlights |
 |-------|-------|------------|
 | [`obscura-ctf`](obscura-ctf) | "Provably secure. Allegedly." — five **original** flaws invented from first principles, no CVE/PoC; **very hard** | deterministic-nonce Schnorr → linear key recovery, Fiat–Shamir without commitment binding, authorize-before-normalize path traversal, keystream reuse via a label-length KDF, bytecode verifier/VM overlapping-instruction escape |
+
+### E-commerce & crypto payments (HackerOne reports)
+| Range | Theme | Highlights |
+|-------|-------|------------|
+| [`vitachain-ctf`](vitachain-ctf) | A vitamin shop with on-chain checkout — six real **disclosed HackerOne reports** at the web ↔ crypto-payment seam; **extremely hard** | signed-webhook amount-binding bypass, reverted-transaction deposit credit, gift-card redemption race, SSRF → IMDS via DNS-rebind TOCTOU, RSA-pubkey-recovery → RS256/HS256 JWT confusion, GraphQL BOLA + alias-batching past the rate limiter |
 
 ---
 

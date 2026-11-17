@@ -1,0 +1,57 @@
+# ============================================================================
+#  VitaChain — CTF range  ("Premium supplements. On-chain checkout.")
+#  Six EXTREMELY-HARD challenges on the web <-> crypto-payment seam, each a
+#  faithful minimal re-impl of a real disclosed HackerOne report / CVE.
+#    c1 settle    — signed payment webhook, no amount<->order binding
+#    c2 ledger    — credits an on-chain deposit from a reverted transaction
+#    c3 rebate    — gift-card redemption race (non-atomic check-then-credit)
+#    c4 warehouse — SSRF->IMDS via DNS-rebind TOCTOU (validate != fetch lookup)
+#    c5 passport  — recover RSA pubkey from JWT sigs, then RS256->HS256 confusion
+#    c6 storefront— GraphQL BOLA via opaque node IDs + alias-batch past the limit
+#
+#    make up       build + start the board (scoreboard on :8700)
+#    make check    run all 6 solvers in-network (proves every flag)
+#    make down     stop + remove
+# ============================================================================
+x-py: &py
+  build: ./app
+  restart: unless-stopped
+  networks: [vitachain]
+
+services:
+  scoreboard:
+    build: ./scoreboard
+    container_name: vita-scoreboard
+    restart: unless-stopped
+    ports: ["${SB_PORT:-8700}:80"]
+    networks: [vitachain]
+
+  c1: { <<: *py, container_name: vita-c1, hostname: c1, environment: { CHALLENGE: c1_settle },    ports: ["8701:80"] }
+  c2: { <<: *py, container_name: vita-c2, hostname: c2, environment: { CHALLENGE: c2_ledger },    ports: ["8702:80"] }
+  c3: { <<: *py, container_name: vita-c3, hostname: c3, environment: { CHALLENGE: c3_rebate },    ports: ["8703:80"] }
+  c4:
+    <<: *py
+    container_name: vita-c4
+    hostname: c4
+    environment: { CHALLENGE: c4_warehouse }
+    ports: ["8704:80"]
+    depends_on: [imds]
+  c5: { <<: *py, container_name: vita-c5, hostname: c5, environment: { CHALLENGE: c5_passport },  ports: ["8705:80"] }
+  c6: { <<: *py, container_name: vita-c6, hostname: c6, environment: { CHALLENGE: c6_storefront }, ports: ["8706:80"] }
+
+  # internal-only metadata service for c4 (no published port — reaching it is the win)
+  imds:
+    build: ./imds
+    container_name: vita-imds
+    hostname: imds
+    restart: unless-stopped
+    networks: [vitachain]
+
+networks:
+  vitachain:
+    name: vitachain_net
+    # explicit subnet: the host's default Docker address pools are exhausted by
+    # the other ranges, so we pin a free /24 instead of drawing from the pool.
+    ipam:
+      config:
+        - subnet: 10.84.0.0/24
