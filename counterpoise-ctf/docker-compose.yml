@@ -1,0 +1,28 @@
+# ============================================================================
+#  counterpoise -- a combinatorics puzzle about asking few questions
+#  One service: a two-pan balance over 1024 sealed tins, good for 255 weighings.
+#
+#    make up      build + start the service        (http://localhost:9300)
+#    make check   run the reference solver in-network, exit 0 iff token recovered
+#    make down    stop + remove
+#    make reset   down + up (fresh hidden vector and token)
+# ============================================================================
+name: counterpoise
+
+services:
+  app:
+    build: ./app
+    container_name: cp-app
+    hostname: app
+    restart: unless-stopped
+    ports: ["9300:80"]
+    networks: [counterpoise]
+
+networks:
+  counterpoise:
+    name: counterpoise_net
+    # Explicit subnet: the host's default Docker address pools are exhausted,
+    # so letting Docker pick one makes `up` fail.
+    ipam:
+      config:
+        - subnet: 10.90.0.0/24

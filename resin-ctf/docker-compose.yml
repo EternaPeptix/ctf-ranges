@@ -1,0 +1,28 @@
+# ============================================================================
+#  resin -- a graph-inference puzzle
+#  One service: a sealed block with 30 studs and an exact ohmmeter.
+#
+#    make up      build + start the service        (http://localhost:9600)
+#    make check   run the reference solver in-network, exit 0 iff token recovered
+#    make down    stop + remove
+#    make reset   down + up (fresh wiring and token)
+# ============================================================================
+name: resin
+
+services:
+  app:
+    build: ./app
+    container_name: rsn-app
+    hostname: app
+    restart: unless-stopped
+    ports: ["9600:80"]
+    networks: [resin]
+
+networks:
+  resin:
+    name: resin_net
+    # Explicit subnet: the host's default Docker address pools are exhausted,
+    # so letting Docker pick one makes `up` fail.
+    ipam:
+      config:
+        - subnet: 10.93.0.0/24

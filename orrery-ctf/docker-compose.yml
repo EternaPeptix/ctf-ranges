@@ -1,0 +1,36 @@
+# ============================================================================
+#  orrery -- a sparse-polynomial reconstruction puzzle sandbox
+#  One service holding a hidden polynomial in six variables over a prime field
+#  (the gear train of a brass orrery) behind a budget of 32 evaluations.
+#
+#    make up      build + start the service        (http://localhost:9500)
+#    make check   fresh instance + reference solver in-network, exit 0 iff token recovered
+#    make down    stop + remove
+#    make reset   down + up (fresh polynomial, fresh token, full budget)
+# ============================================================================
+name: orrery
+
+services:
+  app:
+    build: ./app
+    container_name: orr-app
+    hostname: app
+    init: true                # so the server stops on SIGTERM at once instead of after a 10 s grace
+    restart: unless-stopped
+    ports: ["9500:80"]
+    networks: [orrery]
+    # Lets `docker compose up --wait` return only once the service answers.
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1/', timeout=2)"]
+      interval: 2s
+      timeout: 3s
+      retries: 15
+
+networks:
+  orrery:
+    name: orrery_net
+    # Explicit subnet: the host's default Docker address pools are exhausted,
+    # so letting Docker pick one makes `up` fail.
+    ipam:
+      config:
+        - subnet: 10.92.0.0/24

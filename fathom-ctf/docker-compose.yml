@@ -1,0 +1,28 @@
+# ============================================================================
+#  fathom -- a number puzzle: name the polynomial from digits of its root
+#  One service: a gauge that reads out exact digits of a hidden algebraic number.
+#
+#    make up      build + start the service        (http://localhost:9700)
+#    make check   run the reference solver in-network, exit 0 iff token recovered
+#    make down    stop + remove
+#    make reset   down + up (fresh polynomial and token)
+# ============================================================================
+name: fathom
+
+services:
+  app:
+    build: ./app
+    container_name: fth-app
+    hostname: app
+    restart: unless-stopped
+    ports: ["9700:80"]
+    networks: [fathom]
+
+networks:
+  fathom:
+    name: fathom_net
+    # Explicit subnet: the host's default Docker address pools are exhausted,
+    # so letting Docker pick one makes `up` fail.
+    ipam:
+      config:
+        - subnet: 10.94.0.0/24

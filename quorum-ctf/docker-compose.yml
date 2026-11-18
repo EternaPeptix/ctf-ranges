@@ -1,0 +1,28 @@
+# ============================================================================
+#  quorum -- a number-theory puzzle about witnesses, some of whom lie
+#  One service: a bench of 250 witnesses guarding one sealed integer.
+#
+#    make up      build + start the service        (http://localhost:9400)
+#    make check   run the reference solver in-network, exit 0 iff token recovered
+#    make down    stop + remove
+#    make reset   down + up (fresh primes, fresh N, fresh liars, fresh token)
+# ============================================================================
+name: quorum
+
+services:
+  app:
+    build: ./app
+    container_name: qrm-app
+    hostname: app
+    restart: unless-stopped
+    ports: ["9400:80"]
+    networks: [quorum]
+
+networks:
+  quorum:
+    name: quorum_net
+    # Explicit subnet: the host's default Docker address pools are exhausted,
+    # so letting Docker pick one makes `up` fail.
+    ipam:
+      config:
+        - subnet: 10.91.0.0/24

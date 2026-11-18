@@ -1,6 +1,6 @@
 # CTF Ranges
 
-A collection of **18 self-contained, automatically-verifiable CTF ranges** —
+A collection of **23 self-contained, automatically-verifiable CTF ranges** —
 each one a small, themed security playground you can stand up with Docker in a
 couple of commands. Every range re-implements real vulnerability classes
 (faithful, minimal, isolated), ships an automated solver, and proves itself
@@ -72,6 +72,16 @@ green, the range is solvable exactly as shipped.
 |-------|-------|------------|
 | [`synapse-ctf`](synapse-ctf) | A black-box function oracle that gives away more than its answers — **extremely hard**, a single genuinely novel technique | cryptanalytic reconstruction of a hidden ReLU network from exact query access: recover its kink hyperplanes from gradient jumps, then fit the output by exact rational linear algebra (no floating point anywhere) |
 | [`treadle-ctf`](treadle-ctf) | A loom whose hidden chain of pattern cards must be worked out — **hard**, a technique near-absent from bug-bounty corpora | active automata learning (Angluin's **L\*** with Rivest–Schapire counterexamples): reconstruct a hidden 24–40-state Mealy machine from membership queries and an exact equivalence teacher |
+
+### Algorithmic reconstruction (query puzzles)
+Pure, self-contained puzzles: a service hides a structured secret, you recover it from queries alone, and an exact reference solver proves it. Each rewards one beautiful technique.
+| Range | Theme | Highlights |
+|-------|-------|------------|
+| [`counterpoise-ctf`](counterpoise-ctf) | 1024 sealed tins, a balance good for 255 weighings | recover a 1024-bit vector from 255 signed-count questions via a **Cantor–Mills detecting matrix** — non-adaptive measurement design, not adaptive search |
+| [`quorum-ctf`](quorum-ctf) | A bench of 250 witnesses, at most 70 of whom lie | recover a 2000-bit `N` from modular residues with errors via **CRT-with-errors / integer Berlekamp–Welch** (rational reconstruction) |
+| [`orrery-ctf`](orrery-ctf) | A brass orrery with six arms and a hidden gear train | reconstruct a 16-term sparse 6-variable polynomial from **32 evaluations** via **Ben-Or–Tiwari / Prony** (Berlekamp–Massey + root-finding over `F_p`) |
+| [`resin-ctf`](resin-ctf) | A block of cast resin, 30 brass studs, sealed resistors | recover a 30-node weighted graph from **effective-resistance** queries — resistance is a squared Euclidean distance; invert the bordered matrix to read the Laplacian |
+| [`fathom-ctf`](fathom-ctf) | A sounding line whose gauge reads a hidden root | recover a degree-6 integer polynomial from **digits of its real root** via integer **LLL** lattice reduction |
 
 ---
 
