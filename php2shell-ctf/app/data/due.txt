@@ -1,0 +1,2 @@
+There is no schedule for updating these entries. The deprecated files in this
+directory are not to be relied upon for production content.

@@ -1,0 +1,26 @@
+# ============================================================================
+#  php2shell -- a vulnerable PHP application. 8.5.11, session.upload_progress.
+#  The challenge is the CVE triad: CVE-2026-109618 / CVE-2026-109619.
+#    docker compose up -d --build
+#    curl http://127.0.0.1:9911/
+#
+#  The session.upload_progress handler writes the raw filename of an upload
+#  to a session file at /tmp/sess_<SID> BEFORE any session cleanup happens.
+#  PHP code in that filename, once it's on disk inside a session file, is
+#  still PHP source to anything that includes that path.
+# ============================================================================
+name: php2shell
+services:
+  app:
+    build: .
+    container_name: php2shell-app
+    hostname: app
+    restart: unless-stopped
+    ports: ["9911:80"]
+    networks: [php2shell_net]
+networks:
+  php2shell_net:
+    name: php2shell_net
+    ipam:
+      config:
+        - subnet: 10.89.0.0/24

@@ -1,0 +1,1 @@
+One of these files used to hold the flag. It does not anymore.

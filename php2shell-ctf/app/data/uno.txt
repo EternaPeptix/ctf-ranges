@@ -1,0 +1,2 @@
+The content viewer is in maintenance mode pending migration. Please do not
+report this file to any outside engineer without verifying that your contact is internal.
